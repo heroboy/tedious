@@ -26,7 +26,7 @@ module.exports = class Parser extends Transform {
     this.options = options;
     this.endOfMessageMarker = {};
 
-    this.buffer = new Buffer(0);
+    this.buffer = Buffer.alloc(0);
     this.position = 0;
     this.suspended = false;
     this.await = undefined;
@@ -35,7 +35,7 @@ module.exports = class Parser extends Transform {
 
   _transform(input, encoding, done) {
     if (input === this.endOfMessageMarker) {
-      done(null, {                                         // generate endOfMessage pseudo token
+      done(null, { // generate endOfMessage pseudo token
         name: 'EOM',
         event: 'endOfMessage'
       });
@@ -78,7 +78,7 @@ module.exports = class Parser extends Transform {
     };
 
     while (!this.suspended && this.position + 1 <= this.buffer.length) {
-      const type = this.buffer.readUInt8(this.position, true);
+      const type = this.buffer.readUInt8(this.position);
 
       this.position += 1;
 

@@ -1,13 +1,15 @@
 language: node_js
 sudo: false
 node_js:
-  - "4"
   - "6"
   - "8"
   - "9"
+  - "10"
 
 stages:
   - test
+  - name: azure
+    if: type = push
   - lint
   - name: release
     if: (branch = master) AND (type = push)
@@ -51,12 +53,32 @@ script:
 jobs:
   include:
     - stage: lint
-      node_js: 4
+      node_js: 6
       before_install: skip
       before_script: skip
       script:
         - npm run lint
         - commitlint-travis
+
+    - stage: azure
+      node_js: 8
+      before_install:
+      - mkdir ~/.tedious
+      - >
+        echo '{
+          "config": {
+            "server": "'${AZURE_SERVER}'",
+            "userName": "'${AZURE_USERNAME}'",
+            "password": "'${AZURE_PASS}'",
+            "options": {
+              "database": "test",
+              "encrypt": true
+            }
+          }
+        }' > ~/.tedious/test-connection.json
+      before_script: skip
+      script: npm run test-integration
+
     - stage: release
       node_js: 8
       before_install: skip

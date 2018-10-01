@@ -4,8 +4,8 @@ const bigint = require('./bigint');
 
 const SHIFT_LEFT_32 = (1 << 16) * (1 << 16);
 const SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;
-const UNKNOWN_PLP_LEN = new Buffer([0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
-const ZERO_LENGTH_BUFFER = new Buffer(0);
+const UNKNOWN_PLP_LEN = Buffer.from([0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+const ZERO_LENGTH_BUFFER = Buffer.alloc(0);
 
 export type Encoding = 'utf8' | 'ucs2' | 'ascii';
 
@@ -29,8 +29,8 @@ module.exports = class WritableTrackingBuffer {
     this.initialSize = initialSize;
     this.encoding = encoding || 'ucs2';
     this.doubleSizeGrowth = doubleSizeGrowth || false;
-    this.buffer = new Buffer(this.initialSize).fill(0);
-    this.compositeBuffer = new Buffer(0);
+    this.buffer = Buffer.alloc(this.initialSize, 0);
+    this.compositeBuffer = Buffer.alloc(0);
     this.position = 0;
   }
 
@@ -40,14 +40,14 @@ module.exports = class WritableTrackingBuffer {
     return this.compositeBuffer;
   }
 
-  copyFrom(buffer) {
+  copyFrom(buffer: Buffer) {
     const length = buffer.length;
     this.makeRoomFor(length);
     buffer.copy(this.buffer, this.position);
     this.position += length;
   }
 
-  makeRoomFor(requiredLength) {
+  makeRoomFor(requiredLength: number) {
     if (this.buffer.length - this.position < requiredLength) {
       if (this.doubleSizeGrowth) {
         let size = Math.max(128, this.buffer.length * 2);
@@ -61,10 +61,10 @@ module.exports = class WritableTrackingBuffer {
     }
   }
 
-  newBuffer(size) {
+  newBuffer(size: number) {
     const buffer = this.buffer.slice(0, this.position);
     this.compositeBuffer = Buffer.concat([this.compositeBuffer, buffer]);
-    this.buffer = (size === 0) ? ZERO_LENGTH_BUFFER : new Buffer(size).fill(0);
+    this.buffer = (size === 0) ? ZERO_LENGTH_BUFFER : Buffer.alloc(size, 0);
     this.position = 0;
   }
 

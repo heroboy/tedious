@@ -14,23 +14,6 @@ var options = {
   tdsVersion: '7_2'
 };
 
-module.exports.dbnull = function(test) {
-  var colMetaData = [{ type: dataTypeByName.Null }];
-
-  var buffer = new WritableTrackingBuffer(0, 'ucs2');
-  buffer.writeUInt8(0xd1);
-
-  var parser = new Parser({ token() {} }, colMetaData, options);
-  parser.write(buffer.data);
-  var token = parser.read();
-
-  test.strictEqual(token.columns.length, 1);
-  test.strictEqual(token.columns[0].value, null);
-  test.strictEqual(token.columns[0].metadata, colMetaData[0]);
-
-  test.done();
-};
-
 module.exports.int = function(test) {
   var colMetaData = [{ type: dataTypeByName.Int }];
   var value = 3;
@@ -59,7 +42,7 @@ module.exports.bigint = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([1, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 127])
+    Buffer.from([1, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 127])
   );
 
   var parser = new Parser({ token() {} }, colMetaData, options);
@@ -80,7 +63,7 @@ module.exports.real = function(test) {
 
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
-  buffer.writeBuffer(new Buffer([0x00, 0x00, 0x18, 0x41]));
+  buffer.writeBuffer(Buffer.from([0x00, 0x00, 0x18, 0x41]));
 
   var parser = new Parser({ token() {} }, colMetaData, options);
   parser.write(buffer.data);
@@ -101,7 +84,7 @@ module.exports.float = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23, 0x40])
+    Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x23, 0x40])
   );
 
   var parser = new Parser({ token() {} }, colMetaData, options);
@@ -130,17 +113,17 @@ module.exports.money = function(test) {
 
   var buffer = new WritableTrackingBuffer(0);
   buffer.writeUInt8(0xd1);
-  buffer.writeBuffer(new Buffer([0x80, 0xd6, 0x12, 0x00]));
+  buffer.writeBuffer(Buffer.from([0x80, 0xd6, 0x12, 0x00]));
   buffer.writeBuffer(
-    new Buffer([0x00, 0x00, 0x00, 0x00, 0x80, 0xd6, 0x12, 0x00])
+    Buffer.from([0x00, 0x00, 0x00, 0x00, 0x80, 0xd6, 0x12, 0x00])
   );
-  buffer.writeBuffer(new Buffer([0x00]));
-  buffer.writeBuffer(new Buffer([0x04, 0x80, 0xd6, 0x12, 0x00]));
+  buffer.writeBuffer(Buffer.from([0x00]));
+  buffer.writeBuffer(Buffer.from([0x04, 0x80, 0xd6, 0x12, 0x00]));
   buffer.writeBuffer(
-    new Buffer([0x08, 0x00, 0x00, 0x00, 0x00, 0x80, 0xd6, 0x12, 0x00])
+    Buffer.from([0x08, 0x00, 0x00, 0x00, 0x00, 0x80, 0xd6, 0x12, 0x00])
   );
   buffer.writeBuffer(
-    new Buffer([0x08, 0xf4, 0x10, 0x22, 0x11, 0xdc, 0x6a, 0xe9, 0x7d])
+    Buffer.from([0x08, 0xf4, 0x10, 0x22, 0x11, 0xdc, 0x6a, 0xe9, 0x7d])
   );
 
   var parser = new Parser({ token() {} }, colMetaData, options);
@@ -239,12 +222,12 @@ module.exports.nVarChar = function(test) {
 
 module.exports.varBinary = function(test) {
   var colMetaData = [{ type: dataTypeByName.VarBinary }];
-  var value = new Buffer([0x12, 0x34]);
+  var value = Buffer.from([0x12, 0x34]);
 
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeUInt16LE(value.length);
-  buffer.writeBuffer(new Buffer(value));
+  buffer.writeBuffer(Buffer.from(value));
   //console.log(buffer.data)
 
   var parser = new Parser({ token() {} }, colMetaData, options);
@@ -261,12 +244,12 @@ module.exports.varBinary = function(test) {
 
 module.exports.binary = function(test) {
   var colMetaData = [{ type: dataTypeByName.Binary }];
-  var value = new Buffer([0x12, 0x34]);
+  var value = Buffer.from([0x12, 0x34]);
 
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeUInt16LE(value.length);
-  buffer.writeBuffer(new Buffer(value));
+  buffer.writeBuffer(Buffer.from(value));
   //console.log(buffer.data)
 
   var parser = new Parser({ token() {} }, colMetaData, options);
@@ -295,7 +278,7 @@ module.exports.varCharMaxNull = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ascii');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
+    Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
   );
   //console.log(buffer.data)
 
@@ -326,7 +309,7 @@ module.exports.varCharMaxUnknownLength = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ascii');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
+    Buffer.from([0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
   );
   buffer.writeUInt32LE(3);
   buffer.writeString(value.slice(0, 3));
@@ -455,7 +438,7 @@ module.exports.varBinaryMaxNull = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
+    Buffer.from([0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
   );
   //console.log(buffer.data)
 
@@ -478,17 +461,17 @@ module.exports.varBinaryMaxUnknownLength = function(test) {
       dataLength: 65535
     }
   ];
-  var value = new Buffer([0x12, 0x34, 0x56, 0x78]);
+  var value = Buffer.from([0x12, 0x34, 0x56, 0x78]);
 
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
+    Buffer.from([0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff])
   );
   buffer.writeUInt32LE(2);
-  buffer.writeBuffer(new Buffer(value.slice(0, 2)));
+  buffer.writeBuffer(Buffer.from(value.slice(0, 2)));
   buffer.writeUInt32LE(2);
-  buffer.writeBuffer(new Buffer(value.slice(2, 4)));
+  buffer.writeBuffer(Buffer.from(value.slice(2, 4)));
   buffer.writeUInt32LE(0);
   //console.log(buffer.data)
 
@@ -523,7 +506,7 @@ module.exports.intN = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([
+    Buffer.from([
       0,
       8,
       0,
@@ -659,7 +642,7 @@ module.exports.guidN = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([
+    Buffer.from([
       0,
       16,
       0x01,
@@ -707,7 +690,7 @@ module.exports.floatN = function(test) {
   var buffer = new WritableTrackingBuffer(0, 'ucs2');
   buffer.writeUInt8(0xd1);
   buffer.writeBuffer(
-    new Buffer([
+    Buffer.from([
       0,
       4,
       0x00,

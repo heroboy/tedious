@@ -51,7 +51,7 @@ class InstanceLookup {
       if (retriesLeft > 0) {
         retriesLeft--;
 
-        const request = new Buffer([0x02]);
+        const request = Buffer.from([0x02]);
         sender = this.createSender(options.server, SQL_SERVER_BROWSER_PORT, request);
         sender.execute((err, message) => {
           clearTimeout(timer);
@@ -65,7 +65,7 @@ class InstanceLookup {
             if (port) {
               callback(undefined, port);
             } else {
-              callback('Port for ' + instanceName + ' not found in ' + message);
+              callback('Port for ' + instanceName + ' not found in ' + options.server);
             }
           }
         });
