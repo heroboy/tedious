@@ -1266,13 +1266,14 @@ class Connection extends EventEmitter {
   sendFedAuthResponsePacket() {
     const accessTokenLen = Buffer.byteLength(this.fedAuthInfo.token.accessToken, 'ucs2');
     const data = new Buffer(8 + accessTokenLen);
+
     let offset = 0;
-    data.writeUInt32LE(accessTokenLen + 4, offset);
-    offset += 4;
-    data.writeUInt32LE(accessTokenLen, offset);
-    offset += 4;
+    offset += data.writeUInt32LE(accessTokenLen + 4, offset);
+    offset += data.writeUInt32LE(accessTokenLen, offset);
     data.write(this.fedAuthInfo.token.accessToken, offset, 'ucs2');
+
     this.messageIo.sendMessage(TYPE.FEDAUTH_TOKEN, data);
+
     // sent the fedAuth token message, the rest is similar to standard login 7
     process.nextTick(() => {
       this.transitionTo(this.STATE.SENT_LOGIN7_WITH_STANDARD_LOGIN);
