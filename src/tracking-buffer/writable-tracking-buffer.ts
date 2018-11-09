@@ -300,8 +300,8 @@ class WritableTrackingBuffer {
 
   writeMoney(value: number) {
     //floor(-1.9) === -2
-    //-1.9|0 === -1 
-    this.writeInt32LE((value * SHIFT_RIGHT_32)|0);
+    //-1.9|0 === -1
+    this.writeInt32LE((value * SHIFT_RIGHT_32) | 0);
     this.writeInt32LE(value & -1);
   }
 }
